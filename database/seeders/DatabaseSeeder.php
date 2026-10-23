@@ -2,24 +2,25 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Adapters\Persistence\UserEloquentModel;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $username = env('ADMIN_USERNAME', 'admin');
+        $password = env('ADMIN_PASSWORD', 'admin_password_seguro');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        UserEloquentModel::updateOrCreate(
+            ['username' => strtolower(trim($username))],
+            [
+                'id' => (string) Str::uuid(),
+                'password_hash' => Hash::make($password),
+                'role' => 'admin',
+            ]
+        );
     }
 }
